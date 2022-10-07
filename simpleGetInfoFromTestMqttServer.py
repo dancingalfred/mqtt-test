@@ -1,3 +1,5 @@
+#We use the following link: http://www.hivemq.com/demos/websocket-client/
+
 import paho.mqtt.client as mqtt #import the client1
 import time
 ############
