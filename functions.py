@@ -4,6 +4,12 @@ from bson.objectid import ObjectId
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
 
+#en funktion som adderar valt information till databasen
+def addDocumentToDatabase(databaseToAddTo:str, collectionToAddTo:str , documentToAddToDatabase:str):
+    database = myclient[databaseToAddTo]
+    collection = database[collectionToAddTo]
+    collection.insert_one(documentToAddToDatabase)
+
 
 #en funktion där man med hjälp av _id kan hitta ett specifikt dokument och ändra valfritt attribut i det
 def updateDocumentById(databaseToUpdate:str, collectionToUpdate:str ,idToUpdate:str, valueToUpdate:str, newValue:str):
