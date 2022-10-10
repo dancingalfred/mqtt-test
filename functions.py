@@ -5,7 +5,7 @@ myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
 
 #en funktion som adderar valt information till databasen
-def addDocumentToDatabase(databaseToAddTo:str, collectionToAddTo:str , documentToAddToDatabase:str):
+def addDocumentToDatabase(databaseToAddTo:str, collectionToAddTo:str , documentToAddToDatabase:dict):
     database = myclient[databaseToAddTo]
     collection = database[collectionToAddTo]
     collection.insert_one(documentToAddToDatabase)
