@@ -1,8 +1,12 @@
 import time
 import ttn
+import paho.mqtt.client as mqttclient 
+import time
+
 
 app_id = "ap-addiva-01"
-access_key = "ttn-account.eiPq8mEeYRL_PNBZsOpPy-O3ABJXYWulODmQGR5PZzg"
+access_key = "dynamit93.NNSXS.GB7LQUCAHNXYDZ65KIS4FV2JDQYVJMYK42DBT2Q.CJ3VVVVKOPIYACEXK45WK6XPTL2QIGC6DIL6JZ2YK3OHLMAEEC7Q"
+
 
 def uplink_callback(msg, client):
   print("Received uplink from ", msg.dev_id)
@@ -11,10 +15,10 @@ def uplink_callback(msg, client):
 handler = ttn.HandlerClient(app_id, access_key)
 
 # using mqtt client
-mqtt_client = handler.data()
+mqtt_client = mqttclient.Client("Mqtt")
 mqtt_client.set_uplink_callback(uplink_callback)
 mqtt_client.connect()
-time.sleep(60)
+time.sleep(160)
 mqtt_client.close()
 
 # using application manager client
