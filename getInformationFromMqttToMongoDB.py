@@ -24,7 +24,6 @@ while True:
     print("creating new instance") 
     client = mqtt.Client("P1") #create new instance
     client.on_message=on_message #attach function to callback
-    #print(f"Detta är vad y innehåller: {y}")
     print("connecting to broker")
     client.connect(broker_address)#connect to broker
     client.loop_start() #start the loop
