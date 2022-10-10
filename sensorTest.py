@@ -15,7 +15,7 @@ def returnPayload(client, userdata, message):
 #  NNSXS.JLAUBPS72BGVVQ4EY2Y6NRWPXAXC6YTBWOWELGA.2WD3PPT7IC4X63WXUVETFIV2GDLVJ4HT4LH25TXXFAKLD5QUADXQ
 #  eu1.cloud.thethings.network:1883
 while True:   
-    broker_address="broker.mqttdashboard.com" 
+    broker_address="eu1.cloud.thethings.network:1883" 
     print("creating new instance") 
     client = mqtt.Client("P1") #create new instance
     client.on_message=on_message #attach function to callback
