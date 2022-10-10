@@ -1,17 +1,30 @@
 import paho.mqtt.client as mqtt #import the client
 import time
+from threading import Thread, Lock
+
+mutex = Lock()
+
+data_list = []
+
 #from functions import 
 
 def on_message(client, userdata, message):
     print(message.topic+" "+str(message.payload))
     print("message received " ,str(message.payload.decode("utf-8")))
+    mutex.acquire()
+    data_list.append()
+    mutex.release()
 
 
 def returnPayload(client, userdata, message):
     print(message.topic+" "+str(message.payload)) #("utf-8")
     x = str(message.topic+" "+str(message.payload))
     return x
-    
+
+def myfunc_2(i, mutex):
+    mutex.acquire()
+
+    mutex.release()
 
 while True:   
     broker_address="broker.mqttdashboard.com" 
