@@ -18,7 +18,7 @@ for a in m:
     print("---------------------------PAYLOAD-START----------------------------")
     print(a.payload)
     document = str(a.payload)
-    document = document[700:775]
-    
+    document = document[700:775] #fortsätt här
+
     addDocumentToDatabase("testData", "sensordata", document)
     print("---------------------------PAYLOAD-START----------------------------")
