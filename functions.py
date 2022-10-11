@@ -18,12 +18,16 @@ def convertPayloadToCorrectFormat(inData, datetime:datetime):
     document["time"] = str(dateAndTime)
 
     if idLvl2 == "eui-a81758fffe075b66":
-        fixed_document = {"Sensor address": "Addiva Sigurdsgatan Skrivbord"}
+        fixed_document = {"Sensor address": "Skrivbord Addiva Sigurdsgatan"}
         fixed_document.update(document)
+    elif idLvl2 == "eui-a81758fffe075b65":
+        fixed_document = {"Sensor address": "Pingisrum Addiva Sigurdsgatan"}
+        fixed_document.update(document)
+    elif idLvl2 == "eui-a81758fffe075c91":
+        fixed_document = {"Sensor address": "Matsal Addiva Sigurdsgatan"}
+        fixed_document.update(document)
+    return fixed_document
 
-
-    print(f"Decive id: {idLvl2}")
-    print(f"Payload: {payloadlvl2}")
 
 #en funktion som adderar valt information till databasen
 def addDocumentToDatabase(databaseToAddTo:str, collectionToAddTo:str , documentToAddToDatabase:dict):
