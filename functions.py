@@ -1,15 +1,35 @@
 import pymongo
 from bson.objectid import ObjectId
-
+from datetime import datetime
+import json
+now = datetime.now()
+dateAndTime = now.strftime("%Y/%m/%d, %H:%M:%S")
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
+
+
+def convertPayloadToCorrectFormat(inData, datetime:datetime):
+    sensorData = inData[2:-1]
+    document = json.loads(sensorData)
+    payloadlvl1 = document["uplink_message"]
+    payloadlvl2 = payloadlvl1["decoded_payload"]
+    idLvl1 = document["end_device_ids"]
+    idLvl2 = idLvl1["device_id"]
+    document["time"] = str(dateAndTime)
+
+    if idLvl2 == "eui-a81758fffe075b66":
+        fixed_document = {"Sensor address": "Addiva Sigurdsgatan Skrivbord"}
+        fixed_document.update(document)
+
+
+    print(f"Decive id: {idLvl2}")
+    print(f"Payload: {payloadlvl2}")
 
 #en funktion som adderar valt information till databasen
 def addDocumentToDatabase(databaseToAddTo:str, collectionToAddTo:str , documentToAddToDatabase:dict):
     database = myclient[databaseToAddTo]
     collection = database[collectionToAddTo]
     collection.insert_one(documentToAddToDatabase)
-
 
 #en funktion där man med hjälp av _id kan hitta ett specifikt dokument och ändra valfritt attribut i det
 def updateDocumentById(databaseToUpdate:str, collectionToUpdate:str ,idToUpdate:str, valueToUpdate:str, newValue:str):

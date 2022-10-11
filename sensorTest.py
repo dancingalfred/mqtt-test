@@ -37,3 +37,8 @@ while True:
 #'decoded_payload":{"humidity":36,"temperature":23.2,"vdd":3625,"waterleak":0'
 
 
+
+
+
+
+
