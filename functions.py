@@ -2,19 +2,21 @@ import pymongo
 from bson.objectid import ObjectId
 from datetime import datetime
 import json
-now = datetime.now()
-dateAndTime = now.strftime("%Y/%m/%d, %H:%M:%S")
+
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
-
-
-def convertPayloadToCorrectFormat(inData, datetime:datetime):
+def convertPayloadToCorrectFormat(inData) -> dict:
+    document = {}
+    now = datetime.now()
+    dateAndTime = now.strftime("%Y/%m/%d, %H:%M:%S")
     sensorData = inData[2:-1]
-    document = json.loads(sensorData)
-    payloadlvl1 = document["uplink_message"]
-    payloadlvl2 = payloadlvl1["decoded_payload"]
-    idLvl1 = document["end_device_ids"]
+    sensorDataToDict = json.loads(sensorData)
+    payloadLvl1 = sensorDataToDict["uplink_message"]
+    payloadLvl2 = payloadLvl1["decoded_payload"]
+    idLvl1 = sensorDataToDict["end_device_ids"]
     idLvl2 = idLvl1["device_id"]
+    document["sensor_id"] = str(idLvl2)
+    document.update(payloadLvl2)
     document["time"] = str(dateAndTime)
 
     if idLvl2 == "eui-a81758fffe075b66":
@@ -27,7 +29,6 @@ def convertPayloadToCorrectFormat(inData, datetime:datetime):
         fixed_document = {"Sensor address": "Matsal Addiva Sigurdsgatan"}
         fixed_document.update(document)
     return fixed_document
-
 
 #en funktion som adderar valt information till databasen
 def addDocumentToDatabase(databaseToAddTo:str, collectionToAddTo:str , documentToAddToDatabase:dict):
@@ -43,10 +44,6 @@ def updateDocumentById(databaseToUpdate:str, collectionToUpdate:str ,idToUpdate:
     newvalues = { "$set": { valueToUpdate: newValue } }
     collection.update_one(query, newvalues)
 
-
-# updateDocumentById("testData", "customers", "633fdc5d9e39c2cab67b7c9c", "name", "Robert")
-# updateDocumentById("testData", "customers", "633fdc5d9e39c2cab67b7c9c", "address", "Sigurdsgatan 20")
-
 #en funktion där man med hjälp av _id hittar och kör delete på ett dokument i en specifik collection
 def removeDocumentById(databaseToUpdate:str, collectionToUpdate:str ,idToUpdate:str, iAmSure:bool):
     database = myclient[databaseToUpdate]
@@ -55,9 +52,6 @@ def removeDocumentById(databaseToUpdate:str, collectionToUpdate:str ,idToUpdate:
     if iAmSure == True:
         collection.delete_one(query)
 
-#removeDocumentById("testData", "customers", "633fe16101d1eec1c4dc560f", True)
-
-
 #en funktion som returnerar ett dokument
 def queryDocumentById(databaseToQuery:str, collectionToQuery:str ,idToQuery:str):
     database = myclient[databaseToQuery]
@@ -65,7 +59,3 @@ def queryDocumentById(databaseToQuery:str, collectionToQuery:str ,idToQuery:str)
     query = {'_id': ObjectId(idToQuery)}
     documentSearchedFor = collection.find(query)
     return documentSearchedFor
-
-# search = queryDocumentById("testData", "customers", "633fdc5d9e39c2cab67b7c9c")
-# for x in search:
-#   print(x)
