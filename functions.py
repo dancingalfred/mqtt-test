@@ -5,6 +5,15 @@ import json
 
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
+def convertPayloadToCorrectFormats(inData) -> dict:
+    data_from_sensor =inData.payload.decode("utf-8")
+    data_to_dict =  json.loads(data_from_sensor)
+    div_id = data_to_dict["end_device_ids"]["device_id"]
+    result = data_to_dict["uplink_message"]["decoded_payload"]
+    print(div_id)
+    print(result)
+
+
 def convertPayloadToCorrectFormat(inData) -> dict:
     document = {}
     now = datetime.now()
