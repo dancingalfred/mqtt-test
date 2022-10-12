@@ -37,6 +37,9 @@ def convertPayloadToCorrectFormat(inData) -> dict:
     elif idLvl2 == "eui-a81758fffe075c91":
         fixed_document = {"Sensor address": "Matsal Addiva Sigurdsgatan"}
         fixed_document.update(document)
+    elif idLvl2 == "eui-a81758fffe034f66":
+        fixed_document = {"Sensor address": "ERS Sensor Addiva Sigurdsgatan"}
+        fixed_document.update(document)
     return fixed_document
 
 #en funktion som adderar valt information till databasen
