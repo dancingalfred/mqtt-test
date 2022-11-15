@@ -2,6 +2,7 @@ import pymongo
 from bson.objectid import ObjectId
 from datetime import datetime
 import json
+import requests
 
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
@@ -14,7 +15,7 @@ def convertPayloadToCorrectFormats(inData) -> dict:
     print(result)
 
 
-def convertPayloadToCorrectFormat(inData) -> dict:
+def convertPayloadToCorrectFormat(inData, infoFromTF) -> dict:
     document = {}
     now = datetime.now()
     dateAndTime = now.strftime("%Y/%m/%d, %H:%M:%S")
@@ -27,6 +28,15 @@ def convertPayloadToCorrectFormat(inData) -> dict:
     document["sensor_id"] = str(idLvl2)
     document.update(payloadLvl2)
     document["time"] = str(dateAndTime)
+    document["outside temperature (TF)"] = infoFromTF[2]
+    document["outside relativeHumidity (TF)"] = infoFromTF[3]
+    if infoFromTF[4] == None:
+        document["precipitation (TF)"] = 0.0
+    else:
+        document["precipitation (TF)"] = infoFromTF[4]
+    document["precipitation type (TF)"] = infoFromTF[5]
+    
+
 
     if idLvl2 == "eui-a81758fffe075b66":
         fixed_document = {"Sensor address": "Skrivbord Addiva Sigurdsgatan"}
@@ -74,3 +84,37 @@ def queryDocumentById(databaseToQuery:str, collectionToQuery:str ,idToQuery:str)
     query = {'_id': ObjectId(idToQuery)}
     documentSearchedFor = collection.find(query)
     return documentSearchedFor
+def queryTrafikverketAPI():
+    data = """
+        <REQUEST>
+            <LOGIN authenticationkey="8c981e556ca74fa7b2128c113e4eeb8c" />
+            <QUERY objecttype="WeatherStation" schemaversion="1">
+                    <FILTER>
+                        <EQ name="Name" value="Vallby" />
+                    </FILTER>            
+                    <INCLUDE>Name</INCLUDE>
+                    <INCLUDE>Measurement.Air.Temp</INCLUDE>
+                    <INCLUDE>Measurement.MeasureTime</INCLUDE>
+                    <INCLUDE>Measurement.Air.RelativeHumidity</INCLUDE>
+                    <INCLUDE>Measurement.Precipitation.AmountName</INCLUDE>
+                    <INCLUDE>Measurement.Precipitation.Amount</INCLUDE>
+            </QUERY>
+        </REQUEST>
+    """
+    data = data.encode('utf8')
+    response = requests.post('https://api.trafikinfo.trafikverket.se/v2/data.json', data=data, headers={'Content-Type': 'text/xml'}).json()
+
+    results = response.get('RESPONSE')
+    nestedDict = results.get("RESULT")
+    nestedList = nestedDict[0].get("WeatherStation")
+    measurement = nestedList[0]
+    stationData = measurement.get("Measurement")
+    measureTime = stationData.get("MeasureTime")
+    airInformation = stationData.get("Air")
+    airTemperature = airInformation.get("Temp")
+    airRelativeHumidity = airInformation.get("RelativeHumidity")
+    precipitation = stationData.get("Precipitation")
+    donwfall = precipitation.get("Amount")
+    donwfallType = precipitation.get("AmountName")
+    stationName = measurement.get("Name")
+    return stationName, measureTime, airTemperature, airRelativeHumidity, donwfall, donwfallType
