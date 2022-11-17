@@ -13,7 +13,7 @@ while True:
         fixed_dictionary = convertPayloadToCorrectFormat(str(signal.payload),infoFromTF)
         addDocumentToDatabase("20221114", "sensordata", fixed_dictionary)
         print(f"added {fixed_dictionary} to sensordata")
-    time.sleep(0)
+    time.sleep(0.1)
     if datetime.now() >= currentTime + timedelta(minutes=5):
         infoFromTF = queryTrafikverketAPI()
         currentTime = datetime.now()
