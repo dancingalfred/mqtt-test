@@ -19,6 +19,16 @@ while True:
         currentTime = datetime.now()
 
 
+    # host = "mongodb://localhost"
+    # port = 27017
+    # db = "20221114"
+    # collection = "sensordata"
+
+    # _connect_mongo(host, port, db)
+
+    # ourData = read_mongo(db, collection, query={}, host=host, port=port, username=None, password=None, no_id=False)
+
+
 
 
 

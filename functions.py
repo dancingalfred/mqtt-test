@@ -1,8 +1,11 @@
 import pymongo
+from pymongo import MongoClient
 from bson.objectid import ObjectId
 from datetime import datetime
 import json
 import requests
+import pandas as pd
+
 
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
@@ -77,7 +80,7 @@ def removeDocumentById(databaseToUpdate:str, collectionToUpdate:str ,idToUpdate:
     if iAmSure == True:
         collection.delete_one(query)
 
-#en funktion som returnerar ett dokument
+#en funktion som returnerar värden från api.trafikinfo.trafikverket.se
 def queryDocumentById(databaseToQuery:str, collectionToQuery:str ,idToQuery:str):
     database = myclient[databaseToQuery]
     collection = database[collectionToQuery]
@@ -118,3 +121,27 @@ def queryTrafikverketAPI():
     donwfallType = precipitation.get("AmountName")
     stationName = measurement.get("Name")
     return stationName, measureTime, airTemperature, airRelativeHumidity, donwfall, donwfallType
+
+
+
+
+###Nedan 3 funktioner är till för att hämta data från mongoDB och skapa en dataframe till ML-alogritmerna att arbeta med
+def _connect_mongo(host, port, db):
+    conn = MongoClient(host, port)
+    return conn[db]
+def read_mongo(db, collection,queryLimit, query={}, host="mongodb://localhost", port=27017,  username=None, password=None, no_id=False):
+    # Connect to MongoDB
+    db = _connect_mongo(host=host, port=port, db=db)
+    # Make a query to the specific DB and Collection
+    cursor = db[collection].find(query).limit(queryLimit)
+    # Expand the cursor and construct the DataFrame
+    df =  pd.DataFrame(list(cursor))
+    # Delete the _id
+    if no_id:
+        del df['_id']
+
+    return df
+def generateDfFromMongoDB(host,collection, port, db, queryLimit):
+    _connect_mongo(host=host, port=port, db=db)
+    df = read_mongo(db, collection,queryLimit, query={}, host=host, port=port, username=None, password=None, no_id=False)
+    return df
