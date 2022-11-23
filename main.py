@@ -28,15 +28,18 @@ while True:
 
         #we print a warning if the temperature is outside our intervalls
         if predictedInsideTemp <=20.0:
+            print(f"******Next Predicted Value:{predictedInsideTemp}******")
             print("******Increase heat******")
             print("******Increase heat******")
             print("******Increase heat******")
             print("******Increase heat******")
         if predictedInsideTemp >=23.5:
+            print(f"******Next Predicted Value:{predictedInsideTemp}******")
             print("******Start cooling******")
             print("******Start cooling******")
             print("******Start cooling******")
         else:
+            print(f"******Next Predicted Value:{predictedInsideTemp}******")
             print("-------------------------------------")
             print("------------Values are ok------------")
             print("-------------------------------------")
