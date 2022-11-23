@@ -28,10 +28,18 @@ while True:
 
         #we print a warning if the temperature is outside our intervalls
         if predictedInsideTemp <=20.0:
-            print("Öka värmen")
+            print("******Öka värmen******")
+            print("******Öka värmen******")
+            print("******Öka värmen******")
+            print("******Öka värmen******")
         if predictedInsideTemp >=23.5:
-            print("Sänk värmen")
-
+            print("******Sänk värmen******")
+            print("******Sänk värmen******")
+            print("******Sänk värmen******")
+        else:
+            print("-------------------------------------")
+            print("-----Värden är inom ok intervall-----")
+            print("-------------------------------------")
 
 
 
