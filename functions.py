@@ -5,6 +5,11 @@ from datetime import datetime
 import json
 import requests
 import pandas as pd
+import time
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+from sklearn.datasets import make_classification
 
 
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
@@ -145,5 +150,45 @@ def generateDfFromMongoDB(host,collection, port, db, queryLimit):
     _connect_mongo(host=host, port=port, db=db)
     df = read_mongo(db, collection,queryLimit, query={}, host=host, port=port, username=None, password=None, no_id=False)
     return df
+
+def predictTemp():
+    host = "mongodb://localhost"
+    port = 27017
+    db = "20221114"
+    collection = "sensordata"
+    query = {}
+    resultsLimit = 80000
+
+    df = generateDfFromMongoDB(host, collection, port, db, resultsLimit)
+    df = df.drop(columns="_id")
+    df = df.drop(columns="light")
+    df = df.drop(columns="motion")
+    df = df.drop(columns="Sensor address")
+    df = df.drop(columns="precipitation (TF)")
+    df = df.drop(columns="vdd")
+    df = df.drop(columns="waterleak")
+    df = df.dropna()
+    le = LabelEncoder()
+    le.fit(df["sensor_id"])
+    df["sensor_id"] = le.transform(df["sensor_id"])
+    le.fit(df["time"])
+    df["time"] = le.transform(df["time"])
+    le.fit(df["precipitation type (TF)"])
+    df["precipitation type (TF)"] = le.transform(df["precipitation type (TF)"])
+    df_X = df.drop(columns="temperature")
+    df_y = df["temperature"] *10
+    df_y=df_y.astype('int')
+    X_train, X_test, y_train, y_test = train_test_split(df_X, df_y, test_size=0.25, random_state=42)
+    clf4  = MLPClassifier(random_state=42,learning_rate_init=0.001,hidden_layer_sizes=(100,100,100,100,100,100,100))
+    clf4.fit(X_train, y_train)
+    sample = X_test.iloc[5:6]
+    sample["sensor_id"] = 1.0
+    sample["humidity"] = 29.0
+    sample["outside temperature (TF)"] = 3.2
+    sample["outside relativeHumidity (TF)"] = 78.7
+    sample["precipitation type (TF)"] = 0.0
+    sample["time"] = 9999.0
+    prediction_sample = clf4.predict(sample)
+    return prediction_sample[0] / 10
 
 

@@ -1,9 +1,10 @@
 import paho.mqtt.subscribe as subscribe
-from functions import addDocumentToDatabase, convertPayloadToCorrectFormat, queryTrafikverketAPI
+from functions import addDocumentToDatabase, convertPayloadToCorrectFormat, queryTrafikverketAPI, predictTemp
 import time
 from datetime import datetime
 from datetime import timedelta
-
+x = predictTemp()
+print(x)
 infoFromTF = queryTrafikverketAPI()
 currentTime = datetime.now()
 while True:
