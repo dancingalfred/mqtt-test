@@ -5,11 +5,17 @@ from datetime import datetime
 import json
 import requests
 import pandas as pd
-import time
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
-from sklearn.datasets import make_classification
+
+
+
+# from pandas import SettingWithCopyWarning
+#import warnings
+
+# filterwarnings()
+# warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 
 
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
@@ -151,6 +157,17 @@ def generateDfFromMongoDB(host,collection, port, db, queryLimit):
     df = read_mongo(db, collection,queryLimit, query={}, host=host, port=port, username=None, password=None, no_id=False)
     return df
 
+def getWeatherForecast():
+    url = "https://api.tomorrow.io/v4/timelines?location=59.6062%2C%2016.5539&fields=temperature&units=metric&timesteps=1h&startTime=now&endTime=nowPlus6h&apikey=oElG0SBnFI1PqyNkpNT8gVP6CAGCLaeu"
+    headers = {
+        "accept": "application/json",
+        "Accept-Encoding": "gzip"
+    }
+    response = requests.get(url, headers=headers)
+    forecast15min = eval(response.text)
+    forecast15min = forecast15min["data"]["timelines"][0]["intervals"][1]["values"]["temperature"]
+    return forecast15min
+
 def predictTemp():
     host = "mongodb://localhost"
     port = 27017
@@ -182,13 +199,21 @@ def predictTemp():
     clf4  = MLPClassifier(random_state=42,learning_rate_init=0.001,hidden_layer_sizes=(100,100,100,100,100,100,100))
     clf4.fit(X_train, y_train)
     sample = X_test.iloc[5:6]
-    sample["sensor_id"] = 1.0
-    sample["humidity"] = 29.0
-    sample["outside temperature (TF)"] = 3.2
-    sample["outside relativeHumidity (TF)"] = 78.7
-    sample["precipitation type (TF)"] = 0.0
-    sample["time"] = 9999.0
+
+    df2 = generateDfFromMongoDB(host, collection, port, db, 1)
+    
+    #här behöber vi se över hur vi converterar senor_id och nederbörd bland annat så det blir samma i jämnförelse, men undertiden hårdkodar vi och testar att funktionen fungerar
+    forecastOutsideTemp = getWeatherForecast()
+    pd.set_option('mode.chained_assignment', None)
+    sample["sensor_id"] = 2
+    sample["humidity"] = df2["humidity"][0] 
+    sample["outside temperature (TF)"] = float(forecastOutsideTemp)
+    sample["outside relativeHumidity (TF)"] = df2["outside relativeHumidity (TF)"][0]
+    sample["precipitation type (TF)"] = 0
+    sample["time"] = 99999999
+    pd.reset_option("mode.chained_assignment")
     prediction_sample = clf4.predict(sample)
+
     return prediction_sample[0] / 10
 
 

@@ -1957,3 +1957,4 @@ __pycache__/neo4j.cpython-39.pyc
 __pycache__/
 .ipynb_checkpoints/testGetDfFromMDB-checkpoint.ipynb
 .ipynb_checkpoints/testNN-checkpoint.ipynb
+__pycache__/functions.cpython-39.pyc
